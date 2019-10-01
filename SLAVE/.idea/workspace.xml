@@ -6,7 +6,15 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96765e7f-628e-4a56-a371-8a9384c48479" name="Default Changelist" comment="" />
+    <list default="true" id="96765e7f-628e-4a56-a371-8a9384c48479" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../MASTER/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MASTER/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../MASTER/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../MASTER/out/production/MASTER/Master.class" beforeDir="false" afterPath="$PROJECT_DIR$/../MASTER/out/production/MASTER/Master.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/SLAVE_jar/SLAVE.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/SLAVE_jar/SLAVE.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SLAVE/Slave/Slave.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SLAVE/Slave/Slave.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Slave/Slave.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Slave/Slave.java" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +28,11 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="ProjectId" id="1RKjLzUgwebr2K03V3uGCofjz9H" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
@@ -51,5 +63,16 @@
       <updated>1569422629744</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
