@@ -1,0 +1,29 @@
+Question 5:
+police : 38
+article : 20
+nationale : 20
+titre : 13
+fonctionnaires : 10
+
+Question 6:
+
+article : 107
+bateau : 106
+tribunal : 72
+lieu : 69
+larticle : 68
+dimmatriculation : 64
+
+Question 7:
+
+article : 23846
+larticle : 22998
+santé : 20197
+directeur : 8604
+lagence : 8290
+conditions : 8096
+
+Question 8:
+
+Counting time is:2886
+Sorting time is:34
