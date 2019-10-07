@@ -8,7 +8,7 @@ public class Main {
 
     public static void  main(String[] args){
         long startTime = System.currentTimeMillis();
-        Map<String, Integer> mapCount = count("deontologie_police_national.txt");
+        Map<String, Integer> mapCount = count("input.txt");
 //        System.out.println(mapCount);
         long endTime = System.currentTimeMillis();
         long totalTimeCount = endTime - startTime;
@@ -79,8 +79,26 @@ public class Main {
      * @param mapToSort
      */
     public static void displayByFrequency(Map<String, Integer> mapToSort){
+        Map<String, Integer> mapSorted = sortByFrequency(mapToSort);
+        display(mapSorted);
+    }
+
+    private static void display(Map<String, Integer> mapSorted) {
+        System.out.println("Affichage par Quantite");
+        int i =0;
+        for (Map.Entry<String, Integer> entry: mapSorted.entrySet()){
+            if(i>50)
+                break;
+            System.out.println(entry.getKey()+ " : " +  entry.getValue());
+            i++;
+        }
+    }
+
+    private static Map<String, Integer> sortByFrequency(Map<String, Integer> mapToSort) {
+        //Creation of an ArrayList of Entries to sort the content of the dictionnary
         List<Map.Entry<String, Integer>> keySorted = new ArrayList<>(mapToSort.entrySet());
         keySorted.sort(new Comparator<Map.Entry<String, Integer>>() {
+            //Override of regular sort method to suitour needs
             @Override
             public int compare(Map.Entry<String, Integer> s, Map.Entry<String, Integer> t1) {
                 if(t1.getValue() == s.getValue()){
@@ -89,14 +107,12 @@ public class Main {
                 return t1.getValue().compareTo(s.getValue());
             }
         });
-        System.out.println("Affichage par Quantite");
-        int i =0;
-        for (Map.Entry entry :keySorted) {
-            if(i>50)
-                break;
-            System.out.println(entry.getKey()+ " : " +  entry.getValue());
-            i++;
+        //Creation of sorted dictionary with LinkedHashMap to keep the sorted order
+        Map<String, Integer> mapSorted = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry: keySorted) {
+            mapSorted.put(entry.getKey(), entry.getValue());
         }
+        return mapSorted;
     }
 
 }
