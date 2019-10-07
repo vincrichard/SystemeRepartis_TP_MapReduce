@@ -1,22 +1,29 @@
 import java.io.*;
-import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 public class Master {
 
     public static void  main(String[] args) throws IOException {
         ProcessBuilder pb = new ProcessBuilder("java", "-jar", "/media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapReduce/SLAVE/out/artifacts/SLAVE_jar/SLAVE.jar");
-//        Map<String, String> env = pb.environment();
-//        pb.directory(new File("/home/vincent"));
-//        File log = new File("log");
-//        pb.redirectErrorStream(true);
-//        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(log));
         Process p = pb.start();
-//        assert pb.redirectInput() == ProcessBuilder.Redirect.PIPE;
-//        assert pb.redirectOutput().file() == log;
-//        assert p.getInputStream().read() == -1;
-        printInputReader(new InputStreamReader(p.getInputStream()));
-        printInputReader(new InputStreamReader(p.getErrorStream()));
+        LinkedBlockingQueue<String> errorQueue = new LinkedBlockingQueue();
+        LinkedBlockingQueue<String> inputQueue = new LinkedBlockingQueue();
+        Thread readError = new Publisher(p.getErrorStream(), errorQueue);
+        Thread readInput = new Publisher(p.getInputStream(), inputQueue);
+        Thread displayError = new ConsumerError(errorQueue);
+        Thread displayInput = new ConsumerInput(p, inputQueue);
+
+        //Autre solution
+//        try {
+//            if(! p.waitFor(15, TimeUnit.SECONDS)){
+//                System.exit(1);
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        printInputReader(new InputStreamReader(p.getInputStream()));
+//        printInputReader(new InputStreamReader(p.getErrorStream()));
     }
 
     public static void printInputReader(Reader reader){
