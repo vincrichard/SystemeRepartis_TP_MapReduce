@@ -9,8 +9,8 @@ public class Master {
         Process p = pb.start();
         LinkedBlockingQueue<String> errorQueue = new LinkedBlockingQueue();
         LinkedBlockingQueue<String> inputQueue = new LinkedBlockingQueue();
-        Thread readError = new Publisher(p.getErrorStream(), errorQueue);
-        Thread readInput = new Publisher(p.getInputStream(), inputQueue);
+        Thread readError = new Publisher(p, errorQueue, Boolean.TRUE);
+        Thread readInput = new Publisher(p, inputQueue);
         Thread displayError = new ConsumerError(errorQueue);
         Thread displayInput = new ConsumerInput(p, inputQueue);
 

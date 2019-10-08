@@ -20,9 +20,10 @@ public class ConsumerInput extends Thread{
             while(! stringToDisplay.contentEquals("EndThread")) {
                 if(! stringToDisplay.isEmpty())
                     System.out.println(stringToDisplay);
-                stringToDisplay = linkedBlockingQueue.poll(10, TimeUnit.SECONDS);
+                stringToDisplay = linkedBlockingQueue.poll(15, TimeUnit.SECONDS);
                 if(stringToDisplay == null){
                     process.destroy();
+                    System.out.println("Process has been destroyed: took too much time");
                     stringToDisplay = "";
                 }
             }

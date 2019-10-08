@@ -19,7 +19,7 @@ public class ConsumerError extends Thread{
             if(! stringToDisplay.isEmpty())
                 System.out.println(stringToDisplay);
             try {
-                stringToDisplay = linkedBlockingQueue.poll(2, TimeUnit.SECONDS);
+                stringToDisplay = linkedBlockingQueue.poll(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
