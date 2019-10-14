@@ -36,12 +36,18 @@ public class Publisher extends Thread{
     private void readingInputStream(LinkedBlockingQueue linkedBlockingQueue) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         try {
+            String line = bufferedReader.readLine();
             while(process.isAlive()) {
-                String line = bufferedReader.readLine();
                 if ( line != null) {
                     linkedBlockingQueue.put(line);
                 }
                 Thread.sleep(200);
+                line = bufferedReader.readLine();
+            }
+            //Gestion des messages restant dans le BufferedReader
+            while(line != null) {
+                linkedBlockingQueue.put(line);
+                line = bufferedReader.readLine();
             }
             linkedBlockingQueue.put("EndThread");
         } catch (IOException | InterruptedException e) {
