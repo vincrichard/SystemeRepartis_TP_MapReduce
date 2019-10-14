@@ -1,34 +1,27 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 public class Master {
 
-    public static void  main(String[] args) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder("java", "-jar", "/media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapReduce/SLAVE/out/artifacts/SLAVE_jar/SLAVE.jar");
-        Process p = pb.start();
-        LinkedBlockingQueue<String> errorQueue = new LinkedBlockingQueue();
-        LinkedBlockingQueue<String> inputQueue = new LinkedBlockingQueue();
-        Thread readError = new Publisher(p, errorQueue, Boolean.TRUE);
-        Thread readInput = new Publisher(p, inputQueue);
-        Thread displayError = new ConsumerError(errorQueue);
-        Thread displayInput = new ConsumerInput(p, inputQueue);
-
-        //Autre solution
-//        try {
-//            if(! p.waitFor(15, TimeUnit.SECONDS)){
-//                System.exit(1);
-//            }
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        printInputReader(new InputStreamReader(p.getInputStream()));
-//        printInputReader(new InputStreamReader(p.getErrorStream()));
+    public static void  main(String[] args) throws IOException, InterruptedException {
+        List<String> ipList = Files.readAllLines(Paths.get("/media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapReduce/data/ipAdress"));
+        List<Thread> threadList = new ArrayList<>();
+        //Process run le programme SLAVE sur les machines connecté en ssh
+        for (String ip: ipList) {
+            ProcessBuilder pbRunSlave = new ProcessBuilder("ssh", "vrichard@" + ip, "java -jar /tmp/vrichard/SLAVE.jar");
+            ConnectingThread runSlaveThread = new ConnectingThread(pbRunSlave);
+            threadList.add(runSlaveThread);
+        }
+        //Attente de la fin de tous les process
+        for (Thread thread: threadList) {
+            thread.join();
+        }
     }
 
-    public static void printInputReader(Reader reader){
-        BufferedReader readerOutput = new BufferedReader(reader);
-//        readerOutput.lines().forEach( System.out::println );
-        System.out.print(readerOutput.lines().collect(Collectors.joining(System.lineSeparator())));
-    }
+
 }
