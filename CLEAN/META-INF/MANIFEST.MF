@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: CLEAN
+Class-Path: /media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapR
+ educe/CLEAN/out/production/CLEAN/
+

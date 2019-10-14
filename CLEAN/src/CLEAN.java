@@ -7,7 +7,7 @@ import java.util.List;
 public class CLEAN {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        List<String> ipList = Files.readAllLines(Paths.get("../data/ipAdress"));
+        List<String> ipList = Files.readAllLines(Paths.get("/media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapReduce/data/ipAdress"));
         List<Thread> threadList = new ArrayList<>();
         //Process de la suppression du dossier /tmp/vrichard/
         for (String ip: ipList) {
