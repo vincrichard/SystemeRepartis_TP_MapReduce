@@ -11,7 +11,7 @@ public class Master {
         List<String> ipList = Files.readAllLines(pathIpAdress);
         Map<String, List<String>> ipDictNumberSplit = copySplits(ipList);
         runMap(ipDictNumberSplit);
-//        copyMachine(ipList, pathIpAdress);
+        copyMachine(ipList, pathIpAdress);
     }
 
     private static void runMap(Map<String, List<String>> ipDictNumberSplit) throws IOException, InterruptedException {
@@ -99,18 +99,18 @@ public class Master {
         threadList.add(scpThread);
     }
 
-//    private static void copyMachine(List<String> ipList, Path pathIpAdress) throws InterruptedException {
-//        List<Thread> threadList = new ArrayList<>();
-//        //Copie du fichier ip Adress
-//        for (String ip : ipList) {
-//            ProcessBuilder pbMkdir = new ProcessBuilder("scp", pathIpAdress.toString(),
-//                    "vrichard@" + ip+":/tmp/vrichard/machine.txt");
-//            ConnectingThread mkdirThread = new ConnectingThread(pbMkdir);
-//            threadList.add(mkdirThread);
-//        }
-//        //Attente de la fin de tous les process de création des dossiers
-//        for (Thread thread : threadList) {
-//            thread.join();
-//        }
-//    }
+    private static void copyMachine(List<String> ipList, Path pathIpAdress) throws InterruptedException {
+        List<Thread> threadList = new ArrayList<>();
+        //Copie du fichier ip Adress
+        for (String ip : ipList) {
+            ProcessBuilder pbMkdir = new ProcessBuilder("scp", pathIpAdress.toString(),
+                    "vrichard@" + ip+":/tmp/vrichard/machine.txt");
+            ConnectingThread mkdirThread = new ConnectingThread(pbMkdir);
+            threadList.add(mkdirThread);
+        }
+        //Attente de la fin de tous les process de création des dossiers
+        for (Thread thread : threadList) {
+            thread.join();
+        }
+    }
 }
