@@ -1,36 +1,39 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class Master {
 
     public static void  main(String[] args) throws IOException, InterruptedException {
-        List<String> ipList = Files.readAllLines(Paths.get("/media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapReduce/data/ipAdress"));
-        copySplits(ipList);
-//        runSlave(ipList);
+        Path pathIpAdress = Paths.get("/media/vincent/C0FC3B20FC3B0FE0/MSBGD/SystemeRepartie/TPMapReduce/data/ipAdress");
+        List<String> ipList = Files.readAllLines(pathIpAdress);
+        Map<String, List<String>> ipDictNumberSplit = copySplits(ipList);
+        runMap(ipDictNumberSplit);
+//        copyMachine(ipList, pathIpAdress);
     }
 
-    private static void runSlave(List<String> ipList) throws IOException, InterruptedException {
+    private static void runMap(Map<String, List<String>> ipDictNumberSplit) throws IOException, InterruptedException {
         List<Thread> threadList = new ArrayList<>();
         //Process run le programme SLAVE sur les machines connecté en ssh
-        processBuilderOnAllIp(ipList, threadList, "java -jar /tmp/vrichard/SLAVE.jar");
-    }
-
-    private static void processBuilderOnAllIp(List<String> ipList, List<Thread> threadList, String s) throws InterruptedException {
-        for (String ip : ipList) {
-            ProcessBuilder pbMkdir = new ProcessBuilder("ssh", "vrichard@" + ip, s);
-            ConnectingThread mkdirThread = new ConnectingThread(pbMkdir);
-            threadList.add(mkdirThread);
+        for(Map.Entry<String, List<String>> entryIpSplits : ipDictNumberSplit.entrySet()){
+            //Calcul sur chaque split de la machine
+            for(String split : entryIpSplits.getValue()) {
+                ProcessBuilder pbRunSplit = new ProcessBuilder("ssh", "vrichard@" + entryIpSplits.getKey(),
+                        "java -jar /tmp/vrichard/SLAVE.jar", "0", split);
+                ConnectingThread runSplitThread = new ConnectingThread(pbRunSplit);
+                threadList.add(runSplitThread);
+            }
         }
-        //Attente de la fin de tous les process de création des dossiers
-        for (Thread thread : threadList) {
+        //Attente de la fin des process
+        for (Thread thread: threadList) {
             thread.join();
         }
+        System.out.println("====== MAP FINISHED =====");
     }
 
-    private static void copySplits(List<String> ipList) throws IOException, InterruptedException {
+    private static Map<String, List<String>> copySplits(List<String> ipList) throws IOException, InterruptedException {
         //List de tread assurant la synchronisation des étapes
         List<Thread> threadList = new ArrayList<>();
         //Dictionaire permettant de garder l'information des couple machine / splits
@@ -64,6 +67,19 @@ public class Master {
         for (Thread thread: threadList) {
             thread.join();
         }
+        return ipDictNumberSplit;
+    }
+
+    private static void processBuilderOnAllIp(List<String> ipList, List<Thread> threadList, String s) throws InterruptedException {
+        for (String ip : ipList) {
+            ProcessBuilder pbMkdir = new ProcessBuilder("ssh", "vrichard@" + ip, s);
+            ConnectingThread mkdirThread = new ConnectingThread(pbMkdir);
+            threadList.add(mkdirThread);
+        }
+        //Attente de la fin de tous les process de création des dossiers
+        for (Thread thread : threadList) {
+            thread.join();
+        }
     }
 
     private static void keepLinkMachineSplit(Map<String, List<String>> ipDictNumberSplit, String split, String ip) {
@@ -82,4 +98,19 @@ public class Master {
         ConnectingThread scpThread = new ConnectingThread(pbScpSplit);
         threadList.add(scpThread);
     }
+
+//    private static void copyMachine(List<String> ipList, Path pathIpAdress) throws InterruptedException {
+//        List<Thread> threadList = new ArrayList<>();
+//        //Copie du fichier ip Adress
+//        for (String ip : ipList) {
+//            ProcessBuilder pbMkdir = new ProcessBuilder("scp", pathIpAdress.toString(),
+//                    "vrichard@" + ip+":/tmp/vrichard/machine.txt");
+//            ConnectingThread mkdirThread = new ConnectingThread(pbMkdir);
+//            threadList.add(mkdirThread);
+//        }
+//        //Attente de la fin de tous les process de création des dossiers
+//        for (Thread thread : threadList) {
+//            thread.join();
+//        }
+//    }
 }
