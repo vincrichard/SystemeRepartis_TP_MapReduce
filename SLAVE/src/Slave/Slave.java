@@ -1,13 +1,13 @@
 package Slave;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Slave {
     public static void main (String[] args) throws InterruptedException, IOException {
@@ -26,25 +26,62 @@ public class Slave {
         }
     }
 
-    private static void shuffle(String mapNameAll) throws IOException {
+    private static void shuffle(String mapNameAll) throws IOException, InterruptedException {
         List<String> lines = fileToArrayList(mapNameAll);
-//        List<String> words = separeWordsInLine(lines);
-//        words.removeAll(Arrays.asList("1"));
-        writeShuffleFile(lines);
+        Map<String,Integer> fileNameHashDict = writeShuffleFile(lines);
+        sendShuffleFile(fileNameHashDict);
     }
 
-    private static void writeShuffleFile(List<String> lines) throws IOException {
+    private static void sendShuffleFile(Map<String, Integer> fileNameHashDict) throws InterruptedException, UnknownHostException {
+        List<Thread> threadList = new ArrayList<>();
+        List<String> ipMachineList = fileToArrayList("/tmp/vrichard/machine.txt");
+        int nbMachine = ipMachineList.size();
+        File shuffleDirectory = new File("/tmp/vrichard/shuffle");
+        if(shuffleDirectory.listFiles() == null){
+            System.out.println("Shuffle directory empty");
+            return;
+        }
+        for (File shuffleFile : shuffleDirectory.listFiles()){
+            int hash = fileNameHashDict.get(shuffleFile.getName());
+            int numeroMachine = hash % nbMachine;
+            String ipToSend = ipMachineList.get(numeroMachine);
 
-        for(String line : lines) {
-            int hashName = line.split(" ")[0].hashCode();
-            String hostname = java.net.InetAddress.getLocalHost().getHostName();
-            Path ouputshuffle = Paths.get("/tmp/vrichard/shuffle/"+hashName+ "-" + hostname +".txt");
-            Files.write(ouputshuffle, Arrays.asList(line), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            creationExternalFolder("shufflesreceived", ipToSend);
+
+            ProcessBuilder sendShuffle = new ProcessBuilder("scp", shuffleFile.getAbsolutePath(),
+                    "vrichard@"+ipToSend+":/tmp/vrichard/shufflesreceived/"+ shuffleFile.getName());
+            ConnectingThread sendShuffleThread = new ConnectingThread(sendShuffle);
+            threadList.add(sendShuffleThread);
+        }
+        //Attente de la fin des process
+        for (Thread thread: threadList) {
+            thread.join();
         }
     }
 
+    private static void creationExternalFolder(String folderName, String ipToSend) throws InterruptedException {
+        ProcessBuilder pbSshMkdir = new ProcessBuilder("ssh", "vrichard@"+ipToSend, "mkdir", "-p", "/tmp/vrichard/"+ folderName);
+        ConnectingThread sshMkdirThread = new ConnectingThread(pbSshMkdir);
+        while(sshMkdirThread.isAlive()){
+            Thread.sleep(200);
+        }
+    }
+
+    private static Map<String, Integer> writeShuffleFile(List<String> lines) throws IOException {
+        Map<String, Integer> fileNameHashDict = new HashMap<>();
+        for(String line : lines) {
+            int hash = line.split(" ")[0].hashCode();
+            String hostname = java.net.InetAddress.getLocalHost().getHostName();
+            String fileName = hash+ "-" + hostname +".txt";
+            Path ouputshuffle = Paths.get("/tmp/vrichard/shuffle/"+ fileName);
+            Files.write(ouputshuffle, Arrays.asList(line), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            fileNameHashDict.put(fileName, hash);
+        }
+        return fileNameHashDict;
+    }
+
     /**
-     * Process créé un dossier dans "tmp/vrichar/fileName
+     * Process créé un dossier dans "tmp/vrichard/fileName
      * @param folderName
      * @throws InterruptedException
      */
