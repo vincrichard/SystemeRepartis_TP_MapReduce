@@ -42,7 +42,8 @@ public class Publisher extends Thread{
                     linkedBlockingQueue.put(line);
                 }
                 Thread.sleep(200);
-                line = bufferedReader.readLine();
+                if(process.isAlive())
+                    line = bufferedReader.readLine();
             }
             //Gestion des messages restant dans le BufferedReader
             while(line != null) {
