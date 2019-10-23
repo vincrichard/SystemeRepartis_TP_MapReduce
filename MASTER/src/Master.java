@@ -12,16 +12,35 @@ public class Master {
         Map<String, List<String>> ipDictNumberSplit = copySplits(ipList);
         runMap(ipDictNumberSplit);
         copyMachine(ipList, pathIpAdress);
+        runShuffle(ipDictNumberSplit);
+    }
+
+    private static void runShuffle(Map<String, List<String>> ipDictNumberSplit) throws InterruptedException {
+        //Modify ipDictNumberSplit to replace the splitNames by mapNames
+        ipDictNumberSplit.forEach((k,v) -> v.replaceAll(splitNames -> "UM"+splitNames.substring(1,2)+".txt" ));
+        executeJar(ipDictNumberSplit, "1");
+        System.out.println("====== SHUFFLE FINISHED =====");
     }
 
     private static void runMap(Map<String, List<String>> ipDictNumberSplit) throws IOException, InterruptedException {
-        List<Thread> threadList = new ArrayList<>();
         //Process run le programme SLAVE sur les machines connecté en ssh
-        for(Map.Entry<String, List<String>> entryIpSplits : ipDictNumberSplit.entrySet()){
+        executeJar(ipDictNumberSplit, "0");
+        System.out.println("====== MAP FINISHED =====");
+    }
+
+    private static void executeJar(Map<String, List<String>> ipDictNumberSplit, String execOption) throws InterruptedException {
+        List<Thread> threadList = new ArrayList<>();
+        String pathToFile = "";
+        if(execOption.contentEquals("0")){
+            pathToFile = "/tmp/vrichard/splits/";
+        }else{
+            pathToFile = "/tmp/vrichard/maps/";
+        }
+        for(Map.Entry<String, List<String>> entryIpNameFile : ipDictNumberSplit.entrySet()){
             //Calcul sur chaque split de la machine
-            for(String split : entryIpSplits.getValue()) {
-                ProcessBuilder pbRunSplit = new ProcessBuilder("ssh", "vrichard@" + entryIpSplits.getKey(),
-                        "java -jar /tmp/vrichard/SLAVE.jar", "0", split);
+            for(String nameFile : entryIpNameFile.getValue()) {
+                ProcessBuilder pbRunSplit = new ProcessBuilder("ssh", "vrichard@" + entryIpNameFile.getKey(),
+                        "java -jar /tmp/vrichard/SLAVE.jar", execOption, pathToFile + nameFile);
                 ConnectingThread runSplitThread = new ConnectingThread(pbRunSplit);
                 threadList.add(runSplitThread);
             }
@@ -30,7 +49,6 @@ public class Master {
         for (Thread thread: threadList) {
             thread.join();
         }
-        System.out.println("====== MAP FINISHED =====");
     }
 
     private static Map<String, List<String>> copySplits(List<String> ipList) throws IOException, InterruptedException {

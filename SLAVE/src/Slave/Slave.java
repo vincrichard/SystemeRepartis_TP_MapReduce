@@ -26,8 +26,8 @@ public class Slave {
         }
     }
 
-    private static void shuffle(String mapNameAll) throws IOException, InterruptedException {
-        List<String> lines = fileToArrayList(mapNameAll);
+    private static void shuffle(String shuffleNameAll) throws IOException, InterruptedException {
+        List<String> lines = fileToArrayList(shuffleNameAll);
         Map<String,Integer> fileNameHashDict = writeShuffleFile(lines);
         sendShuffleFile(fileNameHashDict);
     }
@@ -100,7 +100,7 @@ public class Slave {
      */
     public static void map(String splitNameAll) throws IOException {
         String splitName = last(splitNameAll.split("/"));
-        List<String> lines = fileToArrayList("/tmp/vrichard/splits/"+splitName);
+        List<String> lines = fileToArrayList(splitNameAll);
         List<String> words = separeWordsInLine(lines);
         words.replaceAll(word -> word+" 1");
         writeSplitFile(splitName, words);
